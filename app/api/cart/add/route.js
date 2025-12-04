@@ -5,8 +5,6 @@ export async function POST(request) {
     const body = await request.json();
     const { productId, productName, price, email } = body;
 
-    // For now, just return success
-    // In real app, you'd save to database
     return Response.json({
       success: true,
       message: 'Product added to cart',
@@ -23,3 +21,4 @@ export async function POST(request) {
     return Response.json({ success: false, error: 'Failed to add to cart' });
   }
 }
+
