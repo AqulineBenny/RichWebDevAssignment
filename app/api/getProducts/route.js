@@ -1,44 +1,79 @@
-import { MongoClient } from 'mongodb';
+export async function GET(req, res) {
+    console.log("in the getProducts api page");
 
-export async function GET() {
-  console.log("Get Products API called");
+    const { MongoClient } = require('mongodb');
+    const url = process.env.MONGODB_URI;
+    const client = new MongoClient(url);
 
-  try {
-    // Connect to MongoDB
-    const client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
+    try {
+        await client.connect();
 
-    const db = client.db('mcdonalds');
-    const products = db.collection('products');
+        const db = client.db('app');
+        const collection = db.collection('products');
 
-    // Get all products
-    const productList = await products.find({}).toArray();
+        const products = await collection.find({}).toArray();
 
-    await client.close();
+        await client.close();
 
-    // If no products in DB, return sample data
-    if (productList.length === 0) {
-      return Response.json([
-        { id: 1, name: 'Big Mac', description: 'Two all-beef patties', price: 4.99, image: '/bigmac.jpg' },
-        { id: 2, name: 'Cheeseburger', description: 'Beef patty with cheese', price: 2.99, image: '/cheeseburger.jpg' },
-        { id: 3, name: 'French Fries', description: 'Golden crispy fries', price: 2.49, image: '/fries.jpg' },
-        { id: 4, name: 'Coca-Cola', description: 'Large refreshing drink', price: 1.99, image: '/coke.jpg' },
-        { id: 5, name: 'McFlurry', description: 'Ice cream with cookies', price: 3.49, image: '/mcflurry.jpg' },
-      ]);
+        if (products.length > 0) {
+            // If database has products, return them
+            return Response.json(products);
+        } else {
+            // Return sample data with free stock images
+            return Response.json([
+                {
+                    "_id": "1",
+                    "name": "Big Mac",
+                    "description": "Two all-beef patties, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun",
+                    "price": 4.99,
+                    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+                    "category": "Burgers"
+                },
+                {
+                    "_id": "2",
+                    "name": "Cheeseburger",
+                    "description": "100% Irish beef patty with a slice of cheese, pickles, mustard, and ketchup",
+                    "price": 2.99,
+                    "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433d?w=400&h=300&fit=crop",
+                    "category": "Burgers"
+                },
+                {
+                    "_id": "3",
+                    "name": "French Fries",
+                    "description": "World famous fries, crispy and golden outside, fluffy inside",
+                    "price": 2.49,
+                    "image": "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=400&h=300&fit=crop",
+                    "category": "Sides"
+                },
+                {
+                    "_id": "4",
+                    "name": "Coca-Cola",
+                    "description": "Large refreshing Coca-Cola with ice",
+                    "price": 1.99,
+                    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=300&fit=crop",
+                    "category": "Drinks"
+                },
+                {
+                    "_id": "5",
+                    "name": "McFlurry",
+                    "description": "Creamy vanilla soft serve with Oreo cookie pieces mixed in",
+                    "price": 3.49,
+                    "image": "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400&h=300&fit=crop",
+                    "category": "Desserts"
+                }
+            ]);
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        // Return sample data even on error
+        return Response.json([
+            {
+                "name": "Big Mac",
+                "description": "Sample product - Two all-beef patties",
+                "price": 4.99,
+                "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop"
+            }
+        ]);
     }
-
-    return Response.json(productList);
-
-  } catch (error) {
-    console.error('Get Products API error:', error);
-
-    // Fallback sample data if DB fails
-    return Response.json([
-      { id: 1, name: 'Big Mac', description: 'Two all-beef patties', price: 4.99, image: '/bigmac.jpg' },
-      { id: 2, name: 'Cheeseburger', description: 'Beef patty with cheese', price: 2.99, image: '/cheeseburger.jpg' },
-      { id: 3, name: 'French Fries', description: 'Golden crispy fries', price: 2.49, image: '/fries.jpg' },
-      { id: 4, name: 'Coca-Cola', description: 'Large refreshing drink', price: 1.99, image: '/coke.jpg' },
-      { id: 5, name: 'McFlurry', description: 'Ice cream with cookies', price: 3.49, image: '/mcflurry.jpg' },
-    ]);
-  }
 }
