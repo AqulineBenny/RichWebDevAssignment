@@ -185,8 +185,8 @@ export default function ManagerPage() {
             </TableHead>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id} hover>
-                  <TableCell>{order.id}</TableCell>
+                <TableRow key={order.id || order.orderId} hover>
+                  <TableCell>{order.id || order.orderId}</TableCell>
                   <TableCell>{order.customer}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
