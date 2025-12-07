@@ -7,7 +7,6 @@ import {
   AppBar, Toolbar, IconButton
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useRouter } from 'next/navigation';
 
@@ -92,16 +91,6 @@ export default function ManagerPage() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             👨‍💼 Manager Dashboard
           </Typography>
-
-          <Button
-            variant="contained"
-            color="secondary"
-            startIcon={<BarChartIcon />}
-            onClick={() => router.push('/manager/graph-data')}
-            sx={{ mr: 2 }}
-          >
-            View Graphs
-          </Button>
 
           <Button
             variant="outlined"
