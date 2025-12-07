@@ -1,79 +1,33 @@
 export async function GET(req, res) {
+    // Make a note we are on the api. This goes to the console.
     console.log("in the getProducts api page");
 
+    // ==============================
+    // Database connection - EXACTLY as shown in Lecture 3, page 61 / Task 4
     const { MongoClient } = require('mongodb');
+
+    // Use your MongoDB Atlas connection string from .env.local
     const url = process.env.MONGODB_URI;
+
     const client = new MongoClient(url);
 
-    try {
-        await client.connect();
+    // Extract database name from connection string (Task 4 method)
+    const urlObj = new URL(process.env.MONGODB_URI);
+    const dbName = urlObj.pathname.replace('/', '') || 'app';
 
-        const db = client.db('app');
-        const collection = db.collection('products');
+    await client.connect();
+    console.log('Connected successfully to server');
 
-        const products = await collection.find({}).toArray();
+    const db = client.db(dbName);
+    const collection = db.collection('products'); // collection name
 
-        await client.close();
+    // Find all products - simple empty query {} means "get all"
+    const findResult = await collection.find({}).toArray();
 
-        if (products.length > 0) {
-            // If database has products, return them
-            return Response.json(products);
-        } else {
-            // Return sample data with free stock images
-            return Response.json([
-                {
-                    "_id": "1",
-                    "name": "Big Mac",
-                    "description": "Two all-beef patties, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun",
-                    "price": 4.99,
-                    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
-                    "category": "Burgers"
-                },
-                {
-                    "_id": "2",
-                    "name": "Cheeseburger",
-                    "description": "100% Irish beef patty with a slice of cheese, pickles, mustard, and ketchup",
-                    "price": 2.99,
-                    "image": "https://images.unsplash.com/photo-1553979459-d2229ba7433d?w=400&h=300&fit=crop",
-                    "category": "Burgers"
-                },
-                {
-                    "_id": "3",
-                    "name": "French Fries",
-                    "description": "World famous fries, crispy and golden outside, fluffy inside",
-                    "price": 2.49,
-                    "image": "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=400&h=300&fit=crop",
-                    "category": "Sides"
-                },
-                {
-                    "_id": "4",
-                    "name": "Coca-Cola",
-                    "description": "Large refreshing Coca-Cola with ice",
-                    "price": 1.99,
-                    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=300&fit=crop",
-                    "category": "Drinks"
-                },
-                {
-                    "_id": "5",
-                    "name": "McFlurry",
-                    "description": "Creamy vanilla soft serve with Oreo cookie pieces mixed in",
-                    "price": 3.49,
-                    "image": "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400&h=300&fit=crop",
-                    "category": "Desserts"
-                }
-            ]);
-        }
+    console.log('Found documents =>', findResult);
+    // ==============================
 
-    } catch (error) {
-        console.error('Error:', error);
-        // Return sample data even on error
-        return Response.json([
-            {
-                "name": "Big Mac",
-                "description": "Sample product - Two all-beef patties",
-                "price": 4.99,
-                "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop"
-            }
-        ]);
-    }
+    // At the end of the process we need to send something back.
+    // Return the array directly as shown in Task 4 (page 24)
+    return Response.json(findResult);
 }
