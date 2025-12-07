@@ -20,7 +20,8 @@ export default function CustomerPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Get user info
+    if (typeof window === 'undefined') return;
+
     const email = localStorage.getItem('userEmail');
     const role = localStorage.getItem('userRole');
 
@@ -30,14 +31,9 @@ export default function CustomerPage() {
     }
 
     setUserEmail(email);
-
-    // Load products
     fetchProducts();
-
-    // Load weather
     fetchWeather();
 
-    // Load cart from localStorage
     const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(savedCart);
 
@@ -64,11 +60,17 @@ export default function CustomerPage() {
     }
   };
 
-  const addToCart = (product) => {
-    const newCart = [...cart, { ...product, cartId: Date.now() }];
-    setCart(newCart);
-    localStorage.setItem('cart', JSON.stringify(newCart));
-  };
+  function putInCart(pname) {
+    console.log("putting in cart: " + pname);
+    fetch(`http://localhost:3000/api/putInCart?pname=${encodeURIComponent(pname)}`);
+
+    const product = products.find(p => p.name === pname);
+    if (product) {
+      const newCart = [...cart, { ...product, cartId: Date.now() }];
+      setCart(newCart);
+      localStorage.setItem('cart', JSON.stringify(newCart));
+    }
+  }
 
   const removeFromCart = (index) => {
     const newCart = cart.filter((_, i) => i !== index);
@@ -97,7 +99,6 @@ export default function CustomerPage() {
 
   return (
     <>
-      {/* Header */}
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -122,7 +123,6 @@ export default function CustomerPage() {
         </Toolbar>
       </AppBar>
 
-      {/* Main Content */}
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" gutterBottom>
           Welcome, {userEmail}
@@ -162,7 +162,7 @@ export default function CustomerPage() {
                       <Button
                         variant="contained"
                         size="small"
-                        onClick={() => addToCart(product)}
+                        onClick={() => putInCart(product.name)}
                       >
                         Add to Cart
                       </Button>
@@ -175,7 +175,6 @@ export default function CustomerPage() {
         )}
       </Container>
 
-      {/* Cart Dialog */}
       <Dialog open={cartDialogOpen} onClose={() => setCartDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           Shopping Cart ({cart.length} items)
