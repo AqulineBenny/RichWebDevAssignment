@@ -109,11 +109,6 @@ export default function LoginPage() {
             </Button>
           </Typography>
 
-          <Typography variant="caption" display="block" sx={{ mt: 2 }}>
-            Demo credentials: manager@mcd.com / password123 (Manager)
-            <br />
-            Demo credentials: customer@mcd.com / password123 (Customer)
-          </Typography>
         </Box>
       </Paper>
     </Container>
