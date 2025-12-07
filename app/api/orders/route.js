@@ -1,20 +1,20 @@
 export async function GET() {
     console.log("in the orders api page");
-    
+
     const { MongoClient } = require('mongodb');
     const url = process.env.MONGODB_URI;
     const client = new MongoClient(url);
-    
+
     try {
         await client.connect();
-        
+
         const db = client.db('app');
         const collection = db.collection('orders');
-        
+
         const orders = await collection.find({}).sort({ date: -1 }).toArray();
-        
+
         await client.close();
-        
+
         if (orders.length > 0) {
             return Response.json(orders);
         } else {
@@ -37,7 +37,7 @@ export async function GET() {
                 }
             ]);
         }
-        
+
     } catch (error) {
         console.error('Error:', error);
         return Response.json([
